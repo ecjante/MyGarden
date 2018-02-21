@@ -16,7 +16,7 @@ import com.example.android.mygarden.ui.MainActivity;
 public class PlantWidgetProvider extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+                                int imageResource, int appWidgetId) {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
@@ -30,13 +30,20 @@ public class PlantWidgetProvider extends AppWidgetProvider {
                 wateringIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.widget_water_button, wateringPendingIntent);
 
+        views.setImageViewResource(R.id.widget_plant_image, imageResource);
+
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        PlantWateringService.startActionWaterPlants(context);
+    }
+
+    public static void updatePlantWidgets(Context context, AppWidgetManager appWidgetManager,
+                                          int imgRes, int[] appWidgetIds) {
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId);
+            updateAppWidget(context, appWidgetManager, imgRes, appWidgetId);
         }
     }
 
