@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -37,15 +38,18 @@ public class PlantWidgetProvider extends AppWidgetProvider {
     }
 
     private static RemoteViews getSinglePlantRemoteView(Context context, int imgRes, long plantId, boolean showWater) {
-        Intent intent;
+        PendingIntent pendingIntent;
         if (plantId == PlantContract.INVALID_PLANT_ID) {
-            intent = new Intent(context, MainActivity.class);
+            Intent intent = new Intent(context, MainActivity.class);
+            pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
             Log.d(PlantWidgetProvider.class.getSimpleName(), "getSinglePlantRemoteView: plantId = " + plantId);
-            intent = new Intent(context, PlantDetailActivity.class);
+            Intent intent = new Intent(context, PlantDetailActivity.class);
             intent.putExtra(PlantDetailActivity.EXTRA_PLANT_ID, plantId);
+            pendingIntent = TaskStackBuilder.create(context)
+                    .addNextIntentWithParentStack(intent)
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         }
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.plant_widget);
 
@@ -77,7 +81,10 @@ public class PlantWidgetProvider extends AppWidgetProvider {
         views.setRemoteAdapter(R.id.widget_grid_view, intent);
 
         Intent appIntent = new Intent(context, PlantDetailActivity.class);
-        PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent appPendingIntent = TaskStackBuilder.create(context)
+                .addNextIntentWithParentStack(appIntent)
+                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setPendingIntentTemplate(R.id.widget_grid_view, appPendingIntent);
 
         views.setEmptyView(R.id.widget_grid_view, R.id.empty_view);
