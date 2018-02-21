@@ -96,7 +96,8 @@ public class PlantWateringService extends IntentService {
         int imgRes = R.drawable.grass;
         boolean canWater = false;
         long plantId = INVALID_PLANT_ID;
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
             int idIndex = cursor.getColumnIndex(PlantContract.PlantEntry._ID);
             int createTimeIndex = cursor.getColumnIndex(PlantEntry.COLUMN_CREATION_TIME);
             int waterTimeIndex = cursor.getColumnIndex(PlantEntry.COLUMN_LAST_WATERED_TIME);
@@ -114,6 +115,8 @@ public class PlantWateringService extends IntentService {
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, PlantWidgetProvider.class));
+
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_grid_view);
 
         PlantWidgetProvider.updatePlantWidgets(this, appWidgetManager, imgRes,
                 plantId, canWater, appWidgetIds);
